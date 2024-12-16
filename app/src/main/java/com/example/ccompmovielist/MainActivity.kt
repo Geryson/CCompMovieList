@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.ccompmovielist.ui.MovieListScreen
+import com.example.ccompmovielist.ui.navigation.MainNavigation
 import com.example.ccompmovielist.ui.theme.CCompMovieListTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CCompMovieListTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    MovieListAppNavHost()
                 }
             }
         }
@@ -31,17 +31,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun MovieListAppNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = MainNavigation.MainMovieScreen.route
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
         modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CCompMovieListTheme {
-        Greeting("Android")
+    ) {
+        composable(route = MainNavigation.MainMovieScreen.route) {
+            MovieListScreen(navController = navController)
+        }
     }
 }
