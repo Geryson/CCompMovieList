@@ -2,10 +2,25 @@ package com.example.ccompmovielist.ui.screen
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.ccompmovielist.ui.data.MovieGenre
 import com.example.ccompmovielist.ui.data.MovieItem
 
 class MovieListViewModel : ViewModel() {
     private val _movieList = mutableStateListOf<MovieItem>()
+
+    init {
+        addMovie(
+            MovieItem(
+                id = "1",
+                title = "asdfmovie",
+                description = "TomSka",
+                releaseDate = "2013-01-01",
+                note = "Mine Turtle! Hello!",
+                genre = MovieGenre.COMEDY,
+                watched = false
+            )
+        )
+    }
 
     fun getAllMovies(): List<MovieItem> {
         return _movieList
