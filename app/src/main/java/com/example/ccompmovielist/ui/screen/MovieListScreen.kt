@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -32,8 +35,10 @@ import com.example.ccompmovielist.ui.data.MovieItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieListScreen(movieListViewModel: MovieListViewModel = viewModel(),
-                    navController: NavHostController) {
+fun MovieListScreen(
+    movieListViewModel: MovieListViewModel = viewModel(),
+    navController: NavHostController
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -45,21 +50,32 @@ fun MovieListScreen(movieListViewModel: MovieListViewModel = viewModel(),
                 }
             )
         },
-        content = {
-            innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
-                    Text(text = "Content")
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier.padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (movieListViewModel.getAllMovies().isEmpty()) {
+                    Text(text = "No movies to show")
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxHeight()) {
+                        items(movieListViewModel.getAllMovies()) {
+                            MovieCard(it)
+                        }
+                    }
                 }
+            }
         }
     )
 }
 
 @Composable
-fun MovieCard(movie: MovieItem,
-              onMovieCheckChange: (Boolean) -> Unit = {},
-              onRemoveMovie: () -> Unit = {}) {
+fun MovieCard(
+    movie: MovieItem,
+    onMovieCheckChange: (Boolean) -> Unit = {},
+    onRemoveMovie: () -> Unit = {}
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
