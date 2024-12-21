@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -102,6 +103,7 @@ fun MovieListScreen(
             FloatingActionButton(
                 onClick = {
                     showAddMovieDialog = true
+                    movieToEdit = null
                 },
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -132,8 +134,8 @@ fun MovieListScreen(
                                 onRemoveMovie = {
                                     movieListViewModel.removeMovie(it)
                                 },
-                                onMovieCheckChange = {
-                                    checked -> movieListViewModel.changeWatchedStatus(it, checked)
+                                onMovieCheckChange = { checked ->
+                                    movieListViewModel.changeWatchedStatus(it, checked)
                                 },
                                 onEditMovie = {
                                     showAddMovieDialog = true
@@ -165,13 +167,21 @@ fun MovieCard(
         ),
         modifier = Modifier.padding(5.dp)
     ) {
-        Row(modifier = Modifier.padding(20.dp).fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             Arrangement.SpaceEvenly,
-            Alignment.CenterVertically) {
+            Alignment.CenterVertically
+        ) {
             Column(
                 modifier = Modifier.wrapContentHeight()
             ) {
-                Text(movie.title, fontSize = 20.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Text(
+                    movie.title,
+                    fontSize = 20.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
                 Text(movie.description)
             }
             Spacer(modifier = Modifier.fillMaxSize(0.3f))
@@ -184,15 +194,19 @@ fun MovieCard(
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete",
-                modifier = Modifier.clickable { onRemoveMovie() }.size(35.dp),
+                modifier = Modifier
+                    .clickable { onRemoveMovie() }
+                    .size(35.dp),
                 tint = Color.Red,
 
-            )
+                )
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Default.Build,
                 contentDescription = "Edit",
-                modifier = Modifier.clickable { onEditMovie(movie) }.size(35.dp),
+                modifier = Modifier
+                    .clickable { onEditMovie(movie) }
+                    .size(35.dp),
                 tint = Color.Blue
             )
         }
@@ -205,12 +219,11 @@ fun MovieForm(
     onDialogClose: () -> Unit = {},
     movieToEdit: MovieItem? = null
 ) {
-    var newMovieTitle by remember { mutableStateOf(movieToEdit?.title ?: "")}
+    var newMovieTitle by remember { mutableStateOf(movieToEdit?.title ?: "") }
     var newMovieDescription by remember { mutableStateOf(movieToEdit?.description ?: "") }
-    var newMovieReleaseDate by remember { mutableStateOf(movieToEdit?.releaseDate ?: "") }
-    var newMovieNote by remember { mutableStateOf(movieToEdit?.note ?: "") }
     var newMovieLink by remember { mutableStateOf(movieToEdit?.link ?: "") }
     var newMovieGenre by remember { mutableStateOf(movieToEdit?.genre ?: MovieGenre.ACTION) }
+    var newMovieWatched by remember { mutableStateOf(movieToEdit?.watched ?: false) }
 
     Dialog(
         onDismissRequest = onDialogClose
@@ -221,28 +234,52 @@ fun MovieForm(
                 .wrapContentHeight(),
             shape = RoundedCornerShape(6.dp)
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            ) {
+                OutlinedTextField(
+                    value = newMovieTitle,
+                    label = { Text(text = "Title") },
+                    onValueChange = { newMovieTitle = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                OutlinedTextField(
+                    value = newMovieDescription,
+                    label = { Text(text = "Description") },
+                    onValueChange = { newMovieDescription = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = newMovieLink,
+                    label = { Text(text = "Link") },
+                    onValueChange = { newMovieLink = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    OutlinedTextField(value = newMovieTitle,
-                        modifier = Modifier.weight(1f),
-                        label = { Text(text = "Title") },
-                        onValueChange = { newMovieTitle = it }
-                    )
-                    OutlinedTextField(value = newMovieDescription,
-                        modifier = Modifier.weight(1f),
-                        label = { Text(text = "Description") },
-                        onValueChange = { newMovieDescription = it }
-                    )
+                    items(MovieGenre.entries.toTypedArray()) { genre ->
+                        Button(
+                            onClick = { newMovieGenre = genre },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (genre == newMovieGenre) Color.Blue else Color.LightGray, // Filled background for selected
+                                contentColor = if (genre == newMovieGenre) Color.White else Color.Black // Text color contrast
+                            )
+                        ) {
+                            Text(genre.name)
+                        }
+                    }
                 }
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = newMovieGenre == MovieGenre.ACTION,
-                        onCheckedChange = {if (newMovieGenre == MovieGenre.ACTION) MovieGenre.COMEDY else MovieGenre.ACTION }
+                        checked = newMovieWatched,
+                        onCheckedChange = { newMovieWatched = !newMovieWatched }
                     )
                     Text(text = "Important")
                 }
@@ -255,22 +292,18 @@ fun MovieForm(
                                     id = UUID.randomUUID().toString(),
                                     title = newMovieTitle,
                                     description = newMovieDescription,
-                                    releaseDate = newMovieReleaseDate,
-                                    note = newMovieNote,
                                     link = newMovieLink,
                                     genre = newMovieGenre,
-                                    watched = false
+                                    watched = newMovieWatched
                                 )
                             )
                         } else {
                             val movieEdited = movieToEdit.copy(
                                 title = newMovieTitle,
                                 description = newMovieDescription,
-                                releaseDate = newMovieReleaseDate,
-                                note = newMovieNote,
                                 link = newMovieLink,
                                 genre = newMovieGenre,
-                                watched = false
+                                watched = newMovieWatched
                             )
 
                             movieListViewModel.editMovie(movieToEdit, movieEdited)
@@ -287,19 +320,50 @@ fun MovieForm(
     }
 }
 
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun GenreSelector(modifier: Modifier = Modifier) {
+//    var selectedIndex by remember { mutableIntStateOf(0) }
+//    val options = MovieGenre.entries.map { it.name }
+//
+//    Column {
+//        options.forEachIndexed { index, label ->
+//            Button(
+//                shape = SegmentedButtonDefaults.itemShape(
+//                    index = index,
+//                    count = options.size
+//                ),
+//                onClick = { selectedIndex = index },
+//                selected = index == selectedIndex,
+//                label = { Text(text = label) },
+//            )
+//        }
+//    }
+//}
+
+//@Preview
+//@Composable
+//fun MovieCardPreview() {
+//    MovieCard(
+//        movie = MovieItem(
+//            id = "1",
+//            title = "asdfmovie",
+//            description = "TomSka",
+//            link = "https://www.youtube.com/watch?v=tCnj-uiRCn8",
+//            genre = MovieGenre.COMEDY,
+//            watched = true
+//        )
+//    )
+//}
+
 @Preview
 @Composable
-fun MovieCardPreview() {
-    MovieCard(
-        movie = MovieItem(
-            id = "1",
-            title = "asdfmovie",
-            description = "TomSka",
-            releaseDate = "2013-01-01",
-            note = "Mine Turtle! Hello!",
-            link = "https://www.youtube.com/watch?v=tCnj-uiRCn8",
-            genre = MovieGenre.COMEDY,
-            watched = true
-        )
-    )
+fun MovieFormPreview() {
+    MovieForm()
 }
+
+//@Preview
+//@Composable
+//fun MovieListScreenPreview() {
+//    MovieListScreen(navController = NavHostController(LocalContext.current))
+//}

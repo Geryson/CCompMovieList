@@ -14,8 +14,6 @@ class MovieListViewModel : ViewModel() {
                 id = "1",
                 title = "asdfmovie",
                 description = "TomSka",
-                releaseDate = "2013-01-01",
-                note = "Mine Turtle! Hello!",
                 link = "https://www.youtube.com/watch?v=tCnj-uiRCn8",
                 genre = MovieGenre.COMEDY,
                 watched = true
@@ -38,8 +36,6 @@ class MovieListViewModel : ViewModel() {
         val newMovie = movie.copy(
             title = movie.title,
             description = movie.description,
-            releaseDate = movie.releaseDate,
-            note = movie.note,
             genre = movie.genre,
             watched = watched
         )
