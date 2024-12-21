@@ -6,6 +6,7 @@ data class MovieItem(
     val description: String,
     val releaseDate: String,
     val note: String,
+    val link: String,
     val genre: MovieGenre,
     val watched: Boolean
 )

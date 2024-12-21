@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,8 +42,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -161,24 +165,34 @@ fun MovieCard(
         ),
         modifier = Modifier.padding(5.dp)
     ) {
-        Row(modifier = Modifier.padding(20.dp)) {
-            Text(movie.title)
-            Spacer(modifier = Modifier.fillMaxSize(0.55f))
+        Row(modifier = Modifier.padding(20.dp).fillMaxWidth(),
+            Arrangement.SpaceEvenly,
+            Alignment.CenterVertically) {
+            Column(
+                modifier = Modifier.wrapContentHeight()
+            ) {
+                Text(movie.title, fontSize = 20.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Text(movie.description)
+            }
+            Spacer(modifier = Modifier.fillMaxSize(0.3f))
             Checkbox(
                 checked = movie.watched,
-                onCheckedChange = onMovieCheckChange
+                onCheckedChange = onMovieCheckChange,
+                Modifier.scale(1.5f)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete",
-                modifier = Modifier.clickable { onRemoveMovie() },
-                tint = Color.Red
+                modifier = Modifier.clickable { onRemoveMovie() }.size(35.dp),
+                tint = Color.Red,
+
             )
+            Spacer(modifier = Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Default.Build,
                 contentDescription = "Edit",
-                modifier = Modifier.clickable { onEditMovie(movie) },
+                modifier = Modifier.clickable { onEditMovie(movie) }.size(35.dp),
                 tint = Color.Blue
             )
         }
@@ -195,6 +209,7 @@ fun MovieForm(
     var newMovieDescription by remember { mutableStateOf(movieToEdit?.description ?: "") }
     var newMovieReleaseDate by remember { mutableStateOf(movieToEdit?.releaseDate ?: "") }
     var newMovieNote by remember { mutableStateOf(movieToEdit?.note ?: "") }
+    var newMovieLink by remember { mutableStateOf(movieToEdit?.link ?: "") }
     var newMovieGenre by remember { mutableStateOf(movieToEdit?.genre ?: MovieGenre.ACTION) }
 
     Dialog(
@@ -242,16 +257,18 @@ fun MovieForm(
                                     description = newMovieDescription,
                                     releaseDate = newMovieReleaseDate,
                                     note = newMovieNote,
+                                    link = newMovieLink,
                                     genre = newMovieGenre,
                                     watched = false
                                 )
                             )
                         } else {
-                            var movieEdited = movieToEdit.copy(
+                            val movieEdited = movieToEdit.copy(
                                 title = newMovieTitle,
                                 description = newMovieDescription,
                                 releaseDate = newMovieReleaseDate,
                                 note = newMovieNote,
+                                link = newMovieLink,
                                 genre = newMovieGenre,
                                 watched = false
                             )
@@ -268,4 +285,21 @@ fun MovieForm(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun MovieCardPreview() {
+    MovieCard(
+        movie = MovieItem(
+            id = "1",
+            title = "asdfmovie",
+            description = "TomSka",
+            releaseDate = "2013-01-01",
+            note = "Mine Turtle! Hello!",
+            link = "https://www.youtube.com/watch?v=tCnj-uiRCn8",
+            genre = MovieGenre.COMEDY,
+            watched = true
+        )
+    )
 }
