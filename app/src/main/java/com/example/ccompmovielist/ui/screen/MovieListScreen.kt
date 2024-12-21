@@ -95,7 +95,14 @@ fun MovieListScreen(
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxHeight()) {
                         items(movieListViewModel.getAllMovies()) {
-                            MovieCard(it)
+                            MovieCard(it,
+                                onRemoveMovie = {
+                                    movieListViewModel.removeMovie(it)
+                                },
+                                onMovieCheckChange = {
+                                    checked -> movieListViewModel.changeWatchedStatus(it, checked)
+                                }
+                            )
                         }
                     }
                 }
