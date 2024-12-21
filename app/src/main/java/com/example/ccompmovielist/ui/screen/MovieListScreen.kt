@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -57,6 +58,8 @@ fun MovieListScreen(
 ) {
     var showAddMovieDialog by rememberSaveable { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
+
+    var movieToEdit: MovieItem? by rememberSaveable { mutableStateOf(null) }
 
     Scaffold(
         topBar = {
@@ -111,7 +114,8 @@ fun MovieListScreen(
                 if (showAddMovieDialog) {
                     MovieForm(
                         onDialogClose = { showAddMovieDialog = false },
-                        movieListViewModel = movieListViewModel
+                        movieListViewModel = movieListViewModel,
+                        movieToEdit = movieToEdit
                     )
                 }
 
@@ -126,6 +130,10 @@ fun MovieListScreen(
                                 },
                                 onMovieCheckChange = {
                                     checked -> movieListViewModel.changeWatchedStatus(it, checked)
+                                },
+                                onEditMovie = {
+                                    showAddMovieDialog = true
+                                    movieToEdit = it
                                 }
                             )
                         }
@@ -140,7 +148,8 @@ fun MovieListScreen(
 fun MovieCard(
     movie: MovieItem,
     onMovieCheckChange: (Boolean) -> Unit = {},
-    onRemoveMovie: () -> Unit = {}
+    onRemoveMovie: () -> Unit = {},
+    onEditMovie: (MovieItem) -> Unit = {}
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -154,7 +163,7 @@ fun MovieCard(
     ) {
         Row(modifier = Modifier.padding(20.dp)) {
             Text(movie.title)
-            Spacer(modifier = Modifier.fillMaxSize(0.7f))
+            Spacer(modifier = Modifier.fillMaxSize(0.55f))
             Checkbox(
                 checked = movie.watched,
                 onCheckedChange = onMovieCheckChange
@@ -166,6 +175,12 @@ fun MovieCard(
                 modifier = Modifier.clickable { onRemoveMovie() },
                 tint = Color.Red
             )
+            Icon(
+                imageVector = Icons.Default.Build,
+                contentDescription = "Edit",
+                modifier = Modifier.clickable { onEditMovie(movie) },
+                tint = Color.Blue
+            )
         }
     }
 }
@@ -173,13 +188,14 @@ fun MovieCard(
 @Composable
 fun MovieForm(
     movieListViewModel: MovieListViewModel = viewModel(),
-    onDialogClose: () -> Unit = {}
+    onDialogClose: () -> Unit = {},
+    movieToEdit: MovieItem? = null
 ) {
-    var newMovieTitle by remember { mutableStateOf("") }
-    var newMovieDescription by remember { mutableStateOf("") }
-    var newMovieReleaseDate by remember { mutableStateOf("") }
-    var newMovieNote by remember { mutableStateOf("") }
-    var newMovieGenre by remember { mutableStateOf(MovieGenre.ACTION) }
+    var newMovieTitle by remember { mutableStateOf(movieToEdit?.title ?: "")}
+    var newMovieDescription by remember { mutableStateOf(movieToEdit?.description ?: "") }
+    var newMovieReleaseDate by remember { mutableStateOf(movieToEdit?.releaseDate ?: "") }
+    var newMovieNote by remember { mutableStateOf(movieToEdit?.note ?: "") }
+    var newMovieGenre by remember { mutableStateOf(movieToEdit?.genre ?: MovieGenre.ACTION) }
 
     Dialog(
         onDismissRequest = onDialogClose
@@ -218,9 +234,20 @@ fun MovieForm(
 
                 Row {
                     Button(onClick = {
-                        movieListViewModel.addMovie(
-                            MovieItem(
-                                id = UUID.randomUUID().toString(),
+                        if (movieToEdit == null) {
+                            movieListViewModel.addMovie(
+                                MovieItem(
+                                    id = UUID.randomUUID().toString(),
+                                    title = newMovieTitle,
+                                    description = newMovieDescription,
+                                    releaseDate = newMovieReleaseDate,
+                                    note = newMovieNote,
+                                    genre = newMovieGenre,
+                                    watched = false
+                                )
+                            )
+                        } else {
+                            var movieEdited = movieToEdit.copy(
                                 title = newMovieTitle,
                                 description = newMovieDescription,
                                 releaseDate = newMovieReleaseDate,
@@ -228,7 +255,12 @@ fun MovieForm(
                                 genre = newMovieGenre,
                                 watched = false
                             )
-                        )
+
+                            movieListViewModel.editMovie(movieToEdit, movieEdited)
+                        }
+
+                        onDialogClose()
+
                     }) {
                         Text(text = "Save")
                     }

@@ -17,7 +17,7 @@ class MovieListViewModel : ViewModel() {
                 releaseDate = "2013-01-01",
                 note = "Mine Turtle! Hello!",
                 genre = MovieGenre.COMEDY,
-                watched = false
+                watched = true
             )
         )
     }
@@ -48,5 +48,10 @@ class MovieListViewModel : ViewModel() {
 
     fun clearAllMovies() {
         _movieList.clear()
+    }
+
+    fun editMovie(movieToEdit: MovieItem, movieEdited: MovieItem) {
+        val index = _movieList.indexOf(movieToEdit)
+        _movieList[index] = movieEdited
     }
 }
