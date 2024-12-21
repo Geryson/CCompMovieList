@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,6 +56,8 @@ fun MovieListScreen(
     navController: NavHostController
 ) {
     var showAddMovieDialog by rememberSaveable { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,6 +67,26 @@ fun MovieListScreen(
                         movieListViewModel.clearAllMovies()
                     }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    }
+                    IconButton(
+                        onClick = {
+                            expanded = !expanded
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                    }
+                    androidx.compose.material3.DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(text = "Demo") },
+                            onClick = { }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(text = "Settings") },
+                            onClick = { }
+                        )
                     }
                 }
             )
