@@ -45,4 +45,8 @@ class MovieListViewModel : ViewModel() {
 
         _movieList[index] = newMovie
     }
+
+    fun clearAllMovies() {
+        _movieList.clear()
+    }
 }

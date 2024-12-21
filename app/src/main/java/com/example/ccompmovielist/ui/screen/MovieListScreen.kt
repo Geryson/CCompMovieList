@@ -60,7 +60,9 @@ fun MovieListScreen(
             TopAppBar(
                 title = { Text(text = "Movie List") },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        movieListViewModel.clearAllMovies()
+                    }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     }
                 }
