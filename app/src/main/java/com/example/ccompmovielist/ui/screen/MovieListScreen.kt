@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,12 +47,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.ccompmovielist.R
 import com.example.ccompmovielist.ui.data.MovieGenre
 import com.example.ccompmovielist.ui.data.MovieItem
 import java.util.UUID
@@ -75,6 +80,16 @@ fun MovieListScreen(
                         movieListViewModel.clearAllMovies()
                     }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    }
+                    IconButton(onClick = {
+                        movieListViewModel.getMoviesInAscendingOrder()
+                    }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = null)
+                    }
+                    IconButton(onClick = {
+                        movieListViewModel.getMoviesInDescendingOrder()
+                    }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = null)
                     }
                     IconButton(
                         onClick = {

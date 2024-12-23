@@ -51,4 +51,12 @@ class MovieListViewModel : ViewModel() {
         val index = _movieList.indexOf(movieToEdit)
         _movieList[index] = movieEdited
     }
+
+    fun getMoviesInAscendingOrder() {
+        _movieList.sortBy { it.title }
+    }
+
+    fun getMoviesInDescendingOrder() {
+        _movieList.sortByDescending { it.title }
+    }
 }
